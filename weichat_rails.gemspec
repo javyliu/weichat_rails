@@ -24,5 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", "~> 3.2.14"
   spec.add_dependency "nokogiri", '>=1.6.0'
   spec.add_dependency 'rest-client'
+  spec.add_dependency 'dalli'
 
 end

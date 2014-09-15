@@ -1,4 +1,4 @@
-module WechatRails
+module WeichatRails
   class Message
 
     JSON_KEY_MAP = {
@@ -8,8 +8,8 @@ module WechatRails
     }
 
     class << self
-      def from_hash message_hash
-        self.new(message_hash)
+      def from_hash msg_hash
+        self.new(msg_hash)
       end
 
       def to to_user
@@ -31,8 +31,8 @@ module WechatRails
 
     attr_reader :message_hash
 
-    def initialize(message_hash)
-      @message_hash = message_hash || {}
+    def initialize(msg_hash)
+      @message_hash = msg_hash || {}
     end
 
     def [](key)

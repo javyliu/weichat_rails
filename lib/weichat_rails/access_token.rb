@@ -1,27 +1,24 @@
-module WechatRails
+module WeichatRails
   class AccessToken
-    attr_reader :client, :appid, :secret, :token_file, :token_data
+    attr_reader :client, :appid, :secret
 
-    def initialize(client, appid, secret, token_file)
+    def initialize(client, appid, secret)
       @appid = appid
       @secret = secret
       @client = client
-      @token_file = token_file
     end
 
+    #store token in rails.cache
     def token
-      begin
-        @token_data ||= JSON.parse(File.read(token_file))
-      rescue
-        self.refresh
+      Rails.cache.fetch("w_access_token#{appid}",expires_in: 7200) do
+        data = client.get("token", params:{grant_type: "client_credential", appid: appid, secret: secret})
+        valid_token(data)
       end
-      return valid_token(@token_data)
     end
 
+    #delete the cache
     def refresh
-      data = client.get("token", params:{grant_type: "client_credential", appid: appid, secret: secret})
-      File.open(token_file, 'w'){|f| f.write(data.to_s)} if valid_token(data)
-      return @token_data = data
+      Rails.cache.delete("w_access_token#{appid}")
     end
 
     private

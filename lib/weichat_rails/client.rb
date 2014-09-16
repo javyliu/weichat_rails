@@ -1,6 +1,6 @@
 require 'rest_client'
 
-module WechatRails
+module WeichatRails
   class Client
 
     attr_reader :base
@@ -30,6 +30,9 @@ module WechatRails
       raise "Request not OK, response code #{response.code}" if response.code != 200
       parse_response(response, as || :json) do |parse_as, data|
         break data unless (parse_as == :json && data["errcode"].present?)
+        #break data if (parse_as != :json || data["errcode"].blank?)
+
+        #如果返回的是json数据并且errcode有值，则会对errcode再做开关判断
 
         case data["errcode"]
         when 0 # for request didn't expect results

@@ -1,15 +1,15 @@
-require 'wechat_rails/client'
-require 'wechat_rails/access_token'
+require 'weichat_rails/client'
+require 'weichat_rails/access_token'
 
-class WechatRails::Api
+class WeichatRails::Api
   attr_reader :access_token, :client
 
   API_BASE = "https://api.weixin.qq.com/cgi-bin/"
   FILE_BASE = "http://file.api.weixin.qq.com/cgi-bin/"
 
-  def initialize appid, secret, token_file
-    @client = WechatRails::Client.new(API_BASE)
-    @access_token = WechatRails::AccessToken.new(@client, appid, secret, token_file)
+  def initialize appid, secret
+    @client = WeichatRails::Client.new(API_BASE)
+    @access_token = WeichatRails::AccessToken.new(@client, appid, secret)
   end
 
   def users
@@ -33,6 +33,7 @@ class WechatRails::Api
     post("menu/create", JSON.generate(menu))
   end
 
+  #返回媒体文件
   def media media_id
     get "media/get", params:{media_id: media_id}, base: FILE_BASE, as: :file
   end
@@ -59,7 +60,7 @@ class WechatRails::Api
     begin
       params ||= {}
       yield(params.merge(access_token: access_token.token))
-    rescue WechatRails::AccessTokenExpiredError
+    rescue WeichatRails::AccessTokenExpiredError
       access_token.refresh
       retry unless (tries -= 1).zero?
     end

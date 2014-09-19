@@ -49,7 +49,7 @@ module WeichatRails
         message_hash[:Content]
 
       when :image, :voice, :video
-        WechatRails.api.media(message_hash[:MediaId])
+        WeichatRails.api.media(message_hash[:MediaId])
 
       when :location
         message_hash.slice(:Location_X, :Location_Y, :Scale, :Label).inject({}){|results, value|
@@ -59,6 +59,11 @@ module WeichatRails
       else
         raise "Don't know how to parse message as #{type}"
       end
+    end
+
+    #add wechat_user for load wechat_user in proc callback
+    def wechat_user user
+      update(:wechat_user=>user)
     end
 
     def to openid

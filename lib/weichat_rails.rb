@@ -1,4 +1,5 @@
 require "weichat_rails/api"
+require  "weichat_rails/auto_generate_secret_key"
 
 module WeichatRails
 
@@ -40,7 +41,7 @@ end
 if defined? ActionController::Base
   class ActionController::Base
     def self.wechat_responder opts={}
-      self.send(:include, WechatRails::Responder)
+      self.send(:include, WeichatRails::Responder)
     end
   end
 end

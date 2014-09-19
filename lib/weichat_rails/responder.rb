@@ -3,13 +3,13 @@ module WeichatRails
     extend ActiveSupport::Concern
 
     included do
+      self.before_filter :init_wechat_or_token, only: [:show, :create]
       self.skip_before_filter :verify_authenticity_token
       self.before_filter :verify_signature, only: [:show, :create]
-      self.before_filter :init_wechat_or_token, only: [:show, :create]
       #delegate :wehcat, to: :class
     end
 
-    attr_accessor :wechat, :token
+    attr_accessor :wechat, :token,:wechat_user
 
 
     module ClassMethods
@@ -86,6 +86,8 @@ module WeichatRails
 
     def create
       req = WeichatRails::Message.from_hash(params[:xml] || post_xml)
+      #add whchat_user for multiplay wechat user
+      req.wechat_user(self.wechat_user)
       response = self.class.responder_for(req) do |responder, *args|
         responder ||= self.class.responders(:fallback).first
 
@@ -113,11 +115,11 @@ module WeichatRails
     end
 
 
-    def wechat_model
-      @wechat_model || WeichatRails.config.public_account_class.constantize
-    end
+    #def wechat_model
+      #@wechat_model || WeichatRails.config.public_account_class.constantize
+    #end
 
-    #TODO init wechat when need to admin account
+    #TODO init wechat , wechat_user,token from database
     def init_wechat_or_token
       raise NotImplementedError, "controller must implement init_wechat_or_token method!if you just need reply,you can init the token,otherwise you need to init whchat and token like: wechat = Wechat::Api.new(opts[:appid], opts[:secret], opts[:access_token]) token = opts[:token]
       "

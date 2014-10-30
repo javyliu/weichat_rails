@@ -1,6 +1,6 @@
 # WeichatRails
 
-TODO: Write a gem description
+Used to manage all the public wechat.
 
 ## Installation
 

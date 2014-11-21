@@ -19,10 +19,10 @@ module WeichatRails
 
   class << self
     def config
-      @config || OpenStruct.new({public_account_class: "WechatUser",wechat_secret_string: nil,wechat_token_string: nil})
+      @config || OpenStruct.new({wechat_secret_string: nil,wechat_token_string: nil})
     end
 
-    #can configure the public_account_class,wechat_secret_string,wechat_token_string in weichat_rails_config.rb file
+    #can configure the wechat_secret_string,wechat_token_string in weichat_rails_config.rb file
     def configure
       yield config if block_given?
     end

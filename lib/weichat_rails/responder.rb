@@ -14,8 +14,10 @@ module WeichatRails
 
     module ClassMethods
 
-      #create rules
-      #we can can store rules in database instead of use on method
+      #定义整体的处理规则，对于不同的message_type,在block块中进行返回数据处理，
+      #on :text do |res,content|
+      #
+      #end
       def on message_type, with: nil, respond: nil, &block
         raise "Unknow message type" unless message_type.in? [:text, :image, :voice, :video, :location, :link, :event, :fallback]
         config=respond.nil? ? {} : {:respond=>respond}
@@ -58,7 +60,8 @@ module WeichatRails
 
       #该方法用于确定预先用on定义的返回信息(一个数组 [{with:,proc:,respond:},*args])做循环处理
       #responds : 预先定义的某类返回信息,类型为[:text, :image, :voice, :video, :location, :link, :event, :fallback]中之一，为一个hash数组
-      #value : 为调用具体返回信息的值
+      #value : 请求内容
+      #优先返回具有with值的on规则
       def match_responders responders, value
         mat = responders.inject({scoped:nil, general:nil}) do |matched, responder|
           condition = responder[:with]
@@ -80,10 +83,13 @@ module WeichatRails
     end
 
 
+    #用于公众号开发者中心服务器配置中的URL配置,其中xxx为该公众号在开发者数据库中的唯一识别码，由auto_generate_secret_key 来产生
+    #如：http://m.pipgame.com/wx/xxxxx
     def show
       render :text => params[:echostr]
     end
 
+    #创建两个message对像，原请求message及返回message信息，返回的message中传入当前公众号对像，用于回调函数中访问该公众号在数据库中的配置信息
     def create
       req = WeichatRails::Message.from_hash(params[:xml] || post_xml)
       #add whchat_user for multiplay wechat user

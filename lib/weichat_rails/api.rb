@@ -30,7 +30,11 @@ class WeichatRails::Api
 
   def menu_create menu
     # 微信不接受7bit escaped json(eg \uxxxx), 中文必须UTF-8编码, 这可能是个安全漏洞
-    post("menu/create", JSON.generate(menu))
+    # 如果是rails4.0以上使用 to_json 即可，否则使用 JSON.generate(menu,:ascii_only => false)
+    # 但以上试过之后仍是不行，在rails c中却是可以的，所以因该是被其它旧版本的json gem给重写了，所以采用以下方法
+    json_str = JSON.generate(menu).gsub!(/\\u([0-9a-z]{4})/){|u| [$1.to_i(16)].pack('U')}
+
+    post("menu/create", json_str )
   end
 
   #返回媒体文件

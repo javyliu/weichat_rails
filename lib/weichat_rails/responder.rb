@@ -3,7 +3,7 @@ module WeichatRails
     extend ActiveSupport::Concern
 
     included do
-      self.before_filter :init_wechat_or_token, only: [:show, :create]
+      self.before_filter :init_wechat_or_token#, only: [:show, :create]
       self.skip_before_filter :verify_authenticity_token
       self.before_filter :verify_signature, only: [:show, :create]
       #delegate :wehcat, to: :class

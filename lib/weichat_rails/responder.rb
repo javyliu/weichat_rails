@@ -93,7 +93,7 @@ module WeichatRails
     def create
       req = WeichatRails::Message.from_hash(params[:xml] || post_xml)
       #add whchat_user for multiplay wechat user
-      req.wechat_user(self.wechat_user)
+      #req.wechat_user(self.wechat_user)
       response = self.class.responder_for(req) do |responder, *args|
         responder ||= self.class.responders(:fallback).first
 

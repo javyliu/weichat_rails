@@ -62,9 +62,9 @@ module WeichatRails
     end
 
     #add wechat_user for load wechat_user in proc callback
-    #def wechat_user user
-    #  update(:wechat_user=>user)
-    #end
+    def wechat_user user
+      update(:wechat_user=>user)
+    end
 
     def to openid
       update(:ToUserName=>openid)

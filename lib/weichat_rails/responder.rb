@@ -38,21 +38,40 @@ module WeichatRails
         @responders[type] ||= Array.new
       end
 
+
+      #指定的过滤方法，默认不使用指定的匹配方法,如为true,
+      def use_matcher mat = false
+        @use_matcher = mat
+      end
+
+      def use_matcher?
+        @user_matcher
+      end
+
       #用于处理用户请求，该方法只关注用户信息类型及用户请求的内容或事件信息
       #事件类型：subscribe(订阅)、unsubscribe(取消订阅),SCAN(关注后扫描)，LOCATION（上报地理位置）,CLICK(自定义菜单事件),VIEW(点击菜单跳转链接时的事件推送)
       def responder_for message, &block
         message_type = message[:MsgType].to_sym
         responders = responders(message_type)
-
-        case message_type
-        when :text
-          yield(* match_responders(responders, message[:Content]))
-
-        when :event
-          yield(* match_responders(responders, message[:Event]))
-
+        if use_matcher?
+          responder = {:method => :find_matcher}
+          case message_type
+          when :text
+            yield(responder,message[:Content])
+          when :event
+            yield(responder,message[:Event])
+          else
+            yield(responder)
+          end
         else
-          yield(responders.first)
+          case message_type
+          when :text
+            yield(* match_responders(responders, message[:Content]))
+          when :event
+            yield(* match_responders(responders, message[:Event]))
+          else
+            yield(responders.first)
+          end
         end
       end
 
@@ -62,6 +81,7 @@ module WeichatRails
       #responds : 预先定义的某类返回信息,类型为[:text, :image, :voice, :video, :location, :link, :event, :fallback]中之一，为一个hash数组
       #value : 请求内容
       #优先返回具有with值的on规则
+      #注：使用on定义的规则只适用于直接在控制器中写死的规则，属于类级别，不适用于后台配置类型,如果responders[msg_type]为空的情况下不产生任何内容
       def match_responders responders, value
         mat = responders.inject({scoped:nil, general:nil}) do |matched, responder|
           condition = responder[:with]
@@ -93,10 +113,12 @@ module WeichatRails
     def create
       req = WeichatRails::Message.from_hash(params[:xml] || post_xml)
       #add whchat_user for multiplay wechat user
-      req.wechat_user(self.wechat_user)
+      #req.wechat_user(self.wechat_user)
       response = self.class.responder_for(req) do |responder, *args|
         responder ||= self.class.responders(:fallback).first
 
+        #next method(responder[:method]).call(*args.unshift(req)) if (responder[:method])
+        next find_matcher(*args.unshift(req)) if (responder[:method])
         next if responder.nil?
         next req.reply.text responder[:respond] if (responder[:respond])
         next responder[:proc].call(*args.unshift(req)) if (responder[:proc])
@@ -129,6 +151,12 @@ module WeichatRails
     def init_wechat_or_token
       raise NotImplementedError, "controller must implement init_wechat_or_token method!if you just need reply,you can init the token,otherwise you need to init whchat and token like: wechat = Wechat::Api.new(opts[:appid], opts[:secret], opts[:access_token]) token = opts[:token]
       "
+    end
+
+    #need to inplement
+    #在这里处理不同值的内容匹配：subscribe(订阅)、unsubscribe(取消订阅),SCAN(关注后扫描)，LOCATION（上报地理位置）,CLICK(自定义菜单事件),VIEW(点击菜单跳转链接时的事件推送)
+    def find_matcher(req,keyword)
+      raise NotImplementedError, "controller must implement find_matcher method,eg: get matcher content from database"
     end
 
   end

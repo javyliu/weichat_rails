@@ -45,7 +45,7 @@ module WeichatRails
       end
 
       def use_matcher?
-        @user_matcher
+        @use_matcher
       end
 
       #用于处理用户请求，该方法只关注用户信息类型及用户请求的内容或事件信息
@@ -59,7 +59,7 @@ module WeichatRails
           when :text
             yield(responder,message[:Content])
           when :event
-            yield(responder,message[:Event])
+            yield(responder,message[:Event],message[:EventKey])
           else
             yield(responder)
           end
@@ -118,8 +118,8 @@ module WeichatRails
         responder ||= self.class.responders(:fallback).first
 
         #next method(responder[:method]).call(*args.unshift(req)) if (responder[:method])
-        next find_matcher(*args.unshift(req)) if (responder[:method])
         next if responder.nil?
+        next find_matcher(*args.unshift(req)) if (responder[:method])
         next req.reply.text responder[:respond] if (responder[:respond])
         next responder[:proc].call(*args.unshift(req)) if (responder[:proc])
       end
@@ -155,7 +155,7 @@ module WeichatRails
 
     #need to inplement
     #在这里处理不同值的内容匹配：subscribe(订阅)、unsubscribe(取消订阅),SCAN(关注后扫描)，LOCATION（上报地理位置）,CLICK(自定义菜单事件),VIEW(点击菜单跳转链接时的事件推送)
-    def find_matcher(req,keyword)
+    def find_matcher(req,keyword,event_key=nil)
       raise NotImplementedError, "controller must implement find_matcher method,eg: get matcher content from database"
     end
 

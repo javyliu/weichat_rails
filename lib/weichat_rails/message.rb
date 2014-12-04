@@ -65,6 +65,9 @@ module WeichatRails
     #def wechat_user user
     #  update(:wechat_user=>user)
     #end
+    def msg_type msg_type
+      update(:msg_type => msg_type)
+    end
 
     def to openid
       update(:ToUserName=>openid)

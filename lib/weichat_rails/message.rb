@@ -66,7 +66,7 @@ module WeichatRails
     #  update(:wechat_user=>user)
     #end
     def kefu msg_type
-      update(:MsgTpte => msg_type)
+      update(:MsgType => msg_type)
     end
 
     def to openid

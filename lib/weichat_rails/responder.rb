@@ -115,18 +115,14 @@ module WeichatRails
       #add whchat_user for multiplay wechat user
       #req.wechat_user(self.wechat_user)
       #如果是多客服消息，直接返回
-      if self.wechat_user.kefu?
-        response = req.reply.kefu("transfer_customer_service")
-      else
-        response = self.class.responder_for(req) do |responder, *args|
-          responder ||= self.class.responders(:fallback).first
+      response = self.class.responder_for(req) do |responder, *args|
+        responder ||= self.class.responders(:fallback).first
 
-          #next method(responder[:method]).call(*args.unshift(req)) if (responder[:method])
-          next if responder.nil?
-          next find_matcher(*args.unshift(req)) if (responder[:method])
-          next req.reply.text responder[:respond] if (responder[:respond])
-          next responder[:proc].call(*args.unshift(req)) if (responder[:proc])
-        end
+        #next method(responder[:method]).call(*args.unshift(req)) if (responder[:method])
+        next if responder.nil?
+        next find_matcher(*args.unshift(req)) if (responder[:method])
+        next req.reply.text responder[:respond] if (responder[:respond])
+        next responder[:proc].call(*args.unshift(req)) if (responder[:proc])
       end
 
       if response.respond_to? :to_xml

@@ -32,9 +32,13 @@ class WeichatRails::Api
     # 微信不接受7bit escaped json(eg \uxxxx), 中文必须UTF-8编码, 这可能是个安全漏洞
     # 如果是rails4.0以上使用 to_json 即可，否则使用 JSON.generate(menu,:ascii_only => false)
     # 但以上试过之后仍是不行，在rails c中却是可以的，所以因该是被其它旧版本的json gem给重写了，所以采用以下方法
-    json_str = JSON.generate(menu).gsub!(/\\u([0-9a-z]{4})/){|u| [$1.to_i(16)].pack('U')}
+    # 原因找到了是：
+    # 如果传的hash为ActiveSupport::HashWithIndifferentAccess 对像，因为用的是3.2.19，所以其编码可能不对
+    # 直接用 Hash对像的话，用的是ruby 2.0 的方法，做JSON.generate的时候对中文不会再编码成 \uxxxx的形式
+    #
+    json_str = JSON.generate(menu)#.gsub!(/\\u([0-9a-z]{4})/){|u| [$1.to_i(16)].pack('U')}
 
-    post("menu/create", json_str )
+    post("menu/create", json_str)
   end
 
   #返回媒体文件

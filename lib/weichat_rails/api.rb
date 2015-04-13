@@ -6,6 +6,7 @@ class WeichatRails::Api
 
   API_BASE = "https://api.weixin.qq.com/cgi-bin/"
   FILE_BASE = "http://file.api.weixin.qq.com/cgi-bin/"
+  #https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token=ACCESS_TOKEN
 
   def initialize appid, secret
     @client = WeichatRails::Client.new(API_BASE)
@@ -26,6 +27,10 @@ class WeichatRails::Api
 
   def menu_delete
     get("menu/delete")
+  end
+
+  def kefulist
+    get("customservice/getkflist")
   end
 
   def menu_create menu

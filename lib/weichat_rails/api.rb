@@ -38,7 +38,7 @@ class WeichatRails::Api
   end
 
   def group_user_id openid
-    post "groups/getid",params:{openid: openid}, content_type: :json
+    post "groups/getid",params:{openid: openid}
   end
 
   def group_update openid, to_groupid

@@ -42,7 +42,7 @@ class WeichatRails::Api
   end
 
   def group_update openid, to_groupid
-    post "groups/members/update",params:{openid: openid,to_groupid: to_groupid}
+    post "groups/members/update",params:{openid: openid,to_groupid: to_groupid}, content_type: :json
   end
 
   def menu_create menu

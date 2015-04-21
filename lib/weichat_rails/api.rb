@@ -37,6 +37,14 @@ class WeichatRails::Api
     get("groups/get")
   end
 
+  def group_user_id openid
+    get("groups/getid",params:{openid: openid})
+  end
+
+  def group_update openid, to_groupid
+    post "groups/members/update",params:{openid: openid,to_groupid: to_groupid}
+  end
+
   def menu_create menu
     # 微信不接受7bit escaped json(eg \uxxxx), 中文必须UTF-8编码, 这可能是个安全漏洞
     # 如果是rails4.0以上使用 to_json 即可，否则使用 JSON.generate(menu,:ascii_only => false)

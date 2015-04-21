@@ -33,6 +33,10 @@ class WeichatRails::Api
     get("customservice/getkflist")
   end
 
+  def group_get
+    get("groups/get")
+  end
+
   def menu_create menu
     # 微信不接受7bit escaped json(eg \uxxxx), 中文必须UTF-8编码, 这可能是个安全漏洞
     # 如果是rails4.0以上使用 to_json 即可，否则使用 JSON.generate(menu,:ascii_only => false)

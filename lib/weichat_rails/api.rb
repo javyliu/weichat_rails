@@ -6,6 +6,7 @@ class WeichatRails::Api
 
   API_BASE = "https://api.weixin.qq.com/cgi-bin/"
   FILE_BASE = "http://file.api.weixin.qq.com/cgi-bin/"
+  KEFU_BASE = "https://api.weixin.qq.com/customservice/"
   #https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token=ACCESS_TOKEN
 
   def initialize appid, secret
@@ -38,11 +39,18 @@ class WeichatRails::Api
   end
 
   def group_user_id openid
-    post "groups/getid",params:{openid: openid}
+    json_str = JSON.generate({openid: openid})
+    post("groups/getid", json_str)
   end
 
   def group_update openid, to_groupid
-    post "groups/members/update",params:{openid: openid,to_groupid: to_groupid}, content_type: :json
+    json_str = JSON.generate({openid: openid,to_groupid: to_groupid})
+    post("groups/members/update", json_str)
+  end
+
+  def get_duokefu_records time,pageindex
+    json_str = JSON.generate({starttime: time.beginning_of_day.to_i,endtime: time.end_of_day.to_i,pagesize: 50,pageindex: pageindex})
+    post("msgrecord/getrecord",json_str,base: KEFU_BASE)
   end
 
   def menu_create menu

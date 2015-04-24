@@ -36,7 +36,7 @@ module WeichatRails
 
         case data["errcode"]
         when 0 # for request didn't expect results
-          true
+          [true,data]
 
         when 42001, 40014 #42001: access_token超时, 40014:不合法的access_token
           raise AccessTokenExpiredError

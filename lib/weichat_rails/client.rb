@@ -41,6 +41,9 @@ module WeichatRails
         when 42001, 40014 #42001: access_token超时, 40014:不合法的access_token
           raise AccessTokenExpiredError
 
+        when 1613189120 # for wx duokefu' msg code
+          [true,data]
+
         else
           raise ResponseError.new(data['errcode'], data['errmsg'])
         end

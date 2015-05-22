@@ -60,6 +60,8 @@ module WeichatRails
             yield(responder,message[:Content])
           when :event
             yield(responder,message[:Event],message[:EventKey])
+          when :image,:voice,:shortvideo
+            yield(responder,'MEDIA',picurl: message[:PicUrl],media_id: message[:MediaId])
           else
             yield(responder)
           end

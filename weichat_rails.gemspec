@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = WeichatRails::VERSION
   spec.authors       = ["javy_liu"]
   spec.email         = ["javy_liu@163.com"]
-  spec.summary       = %q{weichat interface for rails based on weichat-rails}
-  spec.description   = %q{weichat use for more than on public weichat account,base on the mysql,~> rails 3.2.16}
+  spec.summary       = %q{wechat interface for rails based on weichat-rails}
+  spec.description   = %q{used for more than one public wechat account,base on the mysql,~> rails 3.2.16}
   spec.homepage      = "https://github.com/javyliu/weichat_rails"
   spec.license       = "MIT"
 

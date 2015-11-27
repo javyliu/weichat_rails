@@ -141,7 +141,7 @@ module WeichatRails
     end
 
     def post_xml
-      data = Hash.from_xml(reqest.raw_post)
+      data = Hash.from_xml(request.raw_post)
       HashWithIndifferentAccess.new_from_hash_copying_default data.fetch('xml', {})
     end
 

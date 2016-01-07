@@ -74,7 +74,7 @@ class WeichatRails::Api
 
 
   def get_duokefu_records time,pageindex
-    json_str = JSON.generate({starttime: time.beginning_of_day.to_i,endtime: time.end_of_day.to_i,pagesize: 20,pageindex: pageindex})
+    json_str = JSON.generate({starttime: time.beginning_of_day.to_i,endtime: time.end_of_day.to_i,pagesize: 10,pageindex: pageindex})
     post("msgrecord/getrecord",json_str,base: KEFU_BASE)
   end
 

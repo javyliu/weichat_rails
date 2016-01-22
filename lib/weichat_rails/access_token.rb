@@ -2,7 +2,6 @@ module WeichatRails
   class AccessToken
     attr_reader :client, :appid, :secret
 
-    CacheScope = "#{Rails.application.class.parent_name}_access_token"
     def initialize(client, appid, secret)
       @appid = appid
       @secret = secret
@@ -11,7 +10,7 @@ module WeichatRails
 
     #store token in rails.cache
     def token
-      Rails.cache.fetch("#{CacheScope}#{appid}",expires_in: 7200) do
+      WeichatRails.config.cahce.fetch(appid,expires_in: 7200) do
         data = client.get("token", params:{grant_type: "client_credential", appid: appid, secret: secret})
         valid_token(data)
       end
@@ -19,7 +18,7 @@ module WeichatRails
 
     #delete the cache
     def refresh
-      Rails.cache.delete("#{CacheScope}#{appid}")
+      WeichatRails.config.cahce.delete(appid)
     end
 
     private

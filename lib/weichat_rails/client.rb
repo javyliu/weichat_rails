@@ -1,33 +1,54 @@
-require 'rest_client'
+require 'http'
+require 'tempfile'
+require 'active_support/core_ext/object/blank'
 
 module WeichatRails
   class Client
 
-    attr_reader :base
+    attr_reader :base,:ssl_context
 
-    def initialize(base)
+    def initialize(base, timeout, skip_verify_ssl)
       @base = base
+      HTTP.timeout(:global, write: timeout, connect: timeout, read: timeout)
+      @ssl_context = OpenSSL::SSL::SSLContext.new
+      @ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE if skip_verify_ssl
     end
 
-    def get path, header={}
-      request(path, header) do |url, _header|
-        RestClient.get(url, _header)
+    def get(path, get_header = {})
+      request(path, get_header) do |url, header|
+        params = header.delete(:params)
+        HTTP.headers(header).get(url, params: params, ssl_context: ssl_context)
       end
     end
 
-    def post path, payload, header = {}
-      request(path, header) do |url, _header|
-        RestClient.post(url, payload, _header)
+    def post(path, payload, post_header = {})
+      request(path, post_header) do |url, header|
+        params = header.delete(:params)
+        HTTP.headers(header).post(url, params: params, body: payload, ssl_context: ssl_context)
       end
     end
+
+    def post_file(path, file, post_header = {})
+      request(path, post_header) do |url, header|
+        params = header.delete(:params)
+        HTTP.headers(header)
+        .post(url, params: params,
+              form: { media: HTTP::FormData::File.new(file),
+                      hack: 'X' }, # Existing here for http-form_data 1.0.1 handle single param improperly
+                      ssl_context: ssl_context)
+      end
+    end
+
+
+
 
     def request path, header={}, &block
       url = "#{header.delete(:base) || self.base}#{path}"
       as = header.delete(:as)
-      header.merge!(:accept => :json)
+      header.merge!('Accept' => 'application/json')
       response = yield(url, header)
 
-      raise "Request not OK, response code #{response.code}" if response.code != 200
+      raise "Request not OK, response status #{response.status}" if response.status != 200
       parse_response(response, as || :json) do |parse_as, data|
         break data unless (parse_as == :json && data["errcode"].present?)
         #break data if (parse_as != :json || data["errcode"].blank?)
@@ -38,12 +59,8 @@ module WeichatRails
         when 0 # for request didn't expect results
           [true,data]
 
-        when 42001, 40014 #42001: access_token超时, 40014:不合法的access_token
+        when 42001, 40014,40001,48001 #42001: access_token超时, 40014:不合法的access_token
           raise AccessTokenExpiredError
-
-        when 1613189120 # for wx duokefu' msg code
-          [true,data]
-
         else
           raise ResponseError.new(data['errcode'], data['errmsg'])
         end
@@ -67,7 +84,7 @@ module WeichatRails
         data = file
 
       when :json
-        data = JSON.parse(response.body)
+        data = JSON.parse response.body.to_s.gsub(/[\u0000-\u001f]+/, '')
 
       else
         data = response.body

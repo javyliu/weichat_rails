@@ -1,3 +1,4 @@
+require 'active_support/concern'
 module WeichatRails
   module AutoGenerateSecretKey
     extend ActiveSupport::Concern

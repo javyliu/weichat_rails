@@ -3,10 +3,16 @@ module WeichatRails
     extend ActiveSupport::Concern
 
     included do
-      self.before_filter :init_wechat_or_token#, only: [:show, :create]
-      self.skip_before_filter :verify_authenticity_token
-      self.before_filter :verify_signature, only: [:show, :create]
-      #delegate :wehcat, to: :class
+      # Rails 5 API mode won't define verify_authenticity_token
+      if defined?(:skip_before_action)
+        before_action :init_wechat_or_token
+        skip_before_action :verify_authenticity_token unless defined?(:verify_authenticity_token)
+        before_action :verify_signature, only: [:show, :create]
+      else
+        before_filter :init_wechat_or_token
+        skip_before_filter :verify_authenticity_token
+        before_filter :verify_signature, only: [:show, :create]
+      end
     end
 
     attr_accessor :wechat, :token,:wechat_user

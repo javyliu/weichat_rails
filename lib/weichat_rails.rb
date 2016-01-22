@@ -1,5 +1,6 @@
 require "weichat_rails/api"
 require  "weichat_rails/auto_generate_secret_key"
+require 'dalli'
 
 module WeichatRails
 
@@ -16,11 +17,18 @@ module WeichatRails
     end
   end
 
+  Config = Struct.new(:cache,:cache_namespace,:appid,:secret,:timeout,:skip_verify_ssl)
 
   class << self
     def config
-      @config || OpenStruct.new({wechat_secret_string: nil,wechat_token_string: nil})
+      @config ||= Config.new(nil,'weichat_rails',nil,nil,20,true)
     end
+
+    def api
+      @weichat_api ||= WeichatRails::Api.new(config.appid,config.secret,config.timeout,config.skip_verify_ssl)
+    end
+
+
 
     #can configure the wechat_secret_string,wechat_token_string in weichat_rails_config.rb file
     def configure
@@ -29,13 +37,14 @@ module WeichatRails
 
   end
 
-  #DEFAULT_TOKEN_COLUMN_NAME = "wechat_token".freeze
-  #DEFAULT_WECHAT_SECRET_KEY = "wechat_secret_key".freeze
+  #config.cache_namespace = 'weichat_rails'
 
-
-  #def self.api
-  # # @api ||= WechatRails::Api.new(self.config.appid, self.config.secret, self.config.access_token)
-  #end
+  #if use rails with dalli,you can set config.cache = Rails.cache
+  config.cache ||= if defined?(::Rails)
+                     Rails.cache
+                   else
+                     Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
+                   end
 end
 
 if defined? ActionController::Base

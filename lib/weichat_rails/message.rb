@@ -2,6 +2,7 @@
 require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/hash/conversions'
 
 module WeichatRails
   class Message
@@ -50,7 +51,7 @@ module WeichatRails
       when :text
         message_hash[:Content]
 
-      when :image, :voice, :video
+      when :image, :voice, :video, :shortvideo
         WeichatRails.api.media(message_hash[:MediaId])
 
       when :location

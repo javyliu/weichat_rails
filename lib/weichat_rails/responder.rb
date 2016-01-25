@@ -24,25 +24,25 @@ module WeichatRails
       #on :text do |res,content|
       #
       #end
-      def on message_type, with: nil, respond: nil, &block
-        raise "Unknow message type" unless message_type.in? [:text, :image, :voice, :video, :location, :link, :event, :fallback]
-        config=respond.nil? ? {} : {:respond=>respond}
-        config.merge!(:proc=>block) if block_given?
+      #def on message_type, with: nil, respond: nil, &block
+      #  raise "Unknow message type" unless message_type.in? [:text, :image, :voice, :video, :location, :link, :event, :fallback]
+      #  config=respond.nil? ? {} : {:respond=>respond}
+      #  config.merge!(:proc=>block) if block_given?
 
-        if (with.present? && !message_type.in?([:text, :event]))
-          raise "Only text and event message can take :with parameters"
-        else
-          config.merge!(:with=>with) if with.present?
-        end
+      #  if (with.present? && !message_type.in?([:text, :event]))
+      #    raise "Only text and event message can take :with parameters"
+      #  else
+      #    config.merge!(:with=>with) if with.present?
+      #  end
 
-        responders(message_type) << config
-        return config
-      end
+      #  responders(message_type) << config
+      #  return config
+      #end
 
-      def responders type
-        @responders ||= Hash.new
-        @responders[type] ||= Array.new
-      end
+      #def responders type
+      #  @responders ||= Hash.new
+      #  @responders[type] ||= Array.new
+      #end
 
 
       #指定的过滤方法，默认不使用指定的匹配方法,如为true,
@@ -58,29 +58,29 @@ module WeichatRails
       #事件类型：subscribe(订阅)、unsubscribe(取消订阅),SCAN(关注后扫描)，LOCATION（上报地理位置）,CLICK(自定义菜单事件),VIEW(点击菜单跳转链接时的事件推送)
       def responder_for message, &block
         message_type = message[:MsgType].to_sym
-        responders = responders(message_type)
-        if use_matcher?
-          responder = {:method => :find_matcher}
-          case message_type
-          when :text
-            yield(responder,message[:Content])
-          when :event
-            yield(responder,message[:Event],message[:EventKey])
-          when :image,:voice,:shortvideo
-            yield(responder,'MEDIA',picurl: message[:PicUrl],media_id: message[:MediaId])
-          else
-            yield(responder)
-          end
+        #responders = responders(message_type)
+        #if use_matcher?
+        responder = {:method => :find_matcher}
+        case message_type
+        when :text
+          yield(responder,message[:Content])
+        when :event
+          yield(responder,message[:Event],message[:EventKey])
+        when :image,:voice,:shortvideo
+          yield(responder,'MEDIA',picurl: message[:PicUrl],media_id: message[:MediaId])
         else
-          case message_type
-          when :text
-            yield(* match_responders(responders, message[:Content]))
-          when :event
-            yield(* match_responders(responders, message[:Event]))
-          else
-            yield(responders.first)
-          end
+          yield(responder)
         end
+        #else
+        #  case message_type
+        #  when :text
+        #    yield(* match_responders(responders, message[:Content]))
+        #  when :event
+        #    yield(* match_responders(responders, message[:Event]))
+        #  else
+        #    yield(responders.first)
+        #  end
+        #end
       end
 
       private
@@ -90,24 +90,25 @@ module WeichatRails
       #value : 请求内容
       #优先返回具有with值的on规则
       #注：使用on定义的规则只适用于直接在控制器中写死的规则，属于类级别，不适用于后台配置类型,如果responders[msg_type]为空的情况下不产生任何内容
-      def match_responders responders, value
-        mat = responders.inject({scoped:nil, general:nil}) do |matched, responder|
-          condition = responder[:with]
+      #def match_responders responders, value
+      #  mat = responders.inject({scoped:nil, general:nil}) do |matched, responder|
+      #    condition = responder[:with]
 
-          if condition.nil?
-            matched[:general] ||= [responder, value]
-            next matched
-          end
+      #    if condition.nil?
+      #      matched[:general] ||= [responder, value]
+      #      next matched
+      #    end
 
-          if condition.is_a? Regexp
-            matched[:scoped] ||= [responder] + $~.captures if(value =~ condition)
-          else
-            matched[:scoped] ||= [responder, value] if(value == condition)
-          end
-          matched
-        end
-        return mat[:scoped] || mat[:general]
-      end
+      #    if condition.is_a? Regexp
+      #      matched[:scoped] ||= [responder] + $~.captures if(value =~ condition)
+      #    else
+      #      matched[:scoped] ||= [responder, value] if(value == condition)
+      #    end
+      #    matched
+      #  end
+      #  return mat[:scoped] || mat[:general]
+      #end
+
     end
 
 

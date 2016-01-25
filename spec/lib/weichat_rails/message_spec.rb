@@ -182,6 +182,75 @@ RSpec.describe WeichatRails::Message do
 
     end
 
+    describe '#to_xml' do
+      let(:response) { WeichatRails::Message.from_hash(response_base) }
+
+      it 'root is xml tag' do
+        hash = Hash.from_xml(response.text('text content').to_xml)
+        expect(hash.keys).to eq(['xml'])
+      end
+
+      it 'collection key is item' do
+        xml = response.news([
+          { title: 'title1', description: 'description', url: 'url', pic_url: 'pic_url' },
+          { title: 'title2', description: 'description', url: 'url', pic_url: 'pic_url' }
+        ]).to_xml
+
+        hash = Hash.from_xml(xml)
+        expect(hash['xml']['Articles']['item']).to be_a Array
+        expect(hash['xml']['Articles']['item'].size).to eq(2)
+      end
+
+    end
+
+    describe '#to_json' do
+      it 'can convert text message' do
+        request = WeichatRails::Message.to('toUser').text('text content')
+        expect(request.to_json).to eq({ touser: 'toUser', msgtype: 'text',text: {content: 'text content'} }.to_json)
+      end
+
+      it 'can convert image message' do
+        request = WeichatRails::Message.to('toUser').image('media_id')
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'image', image: {media_id: 'media_id'}}.to_json)
+      end
+
+      it 'can convert voice message' do
+        request = WeichatRails::Message.to('toUser').voice('media_id')
+
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'voice', voice: {media_id: 'media_id'}}.to_json)
+      end
+
+      it 'can convert video message' do
+        request = WeichatRails::Message.to('toUser').video('media_id', title: 'title', description: 'description')
+
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'video', video: {media_id: 'media_id', title: 'title', description: 'description'}}.to_json)
+      end
+
+
+      it 'can convert music message' do
+        request = WeichatRails::Message.to('toUser').music('thumb_media_id', 'music_url', title: 'title', description: 'description', HQ_music_url: 'hq_music_url')
+
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'music', music: {title: 'title', description: 'description', hqmusicurl: 'hq_music_url', musicurl: 'music_url', thumb_media_id: 'thumb_media_id'}}.to_json)
+      end
+
+      it 'can convert news message' do
+        request = WeichatRails::Message.to('toUser').news([{ title: 'title', description: 'description', url: 'url', pic_url: 'pic_url'}])
+
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'news', news: {articles: [
+          {
+            title: 'title',
+            description: 'description',
+            picurl: 'pic_url',
+            url: 'url'
+          }
+        ]}}.to_json)
+      end
+
+
+
+
+    end
+
 
 
   end

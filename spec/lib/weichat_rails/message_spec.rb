@@ -223,18 +223,30 @@ RSpec.describe WeichatRails::Message do
       it 'can convert video message' do
         request = WeichatRails::Message.to('toUser').video('media_id', title: 'title', description: 'description')
 
-        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'video', video: {media_id: 'media_id', title: 'title', description: 'description'}}.to_json)
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'video',
+                                       video: {media_id: 'media_id', title: 'title', description: 'description'}}.to_json)
       end
 
 
       it 'can convert music message' do
-        request = WeichatRails::Message.to('toUser').music('thumb_media_id', 'music_url', title: 'title', description: 'description', HQ_music_url: 'hq_music_url')
+        request = WeichatRails::Message.to('toUser')
+        .music('thumb_media_id', 'music_url',
+               title: 'title', description: 'description',
+               HQ_music_url: 'hq_music_url')
 
-        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'music', music: {title: 'title', description: 'description', hqmusicurl: 'hq_music_url', musicurl: 'music_url', thumb_media_id: 'thumb_media_id'}}.to_json)
+        expect(request.to_json).to eq({touser: 'toUser', msgtype: 'music',
+                                       music: {title: 'title',
+                                               description: 'description',
+                                               hqmusicurl: 'hq_music_url',
+                                               musicurl: 'music_url',
+                                               thumb_media_id: 'thumb_media_id'}}.to_json)
       end
 
       it 'can convert news message' do
-        request = WeichatRails::Message.to('toUser').news([{ title: 'title', description: 'description', url: 'url', pic_url: 'pic_url'}])
+        request = WeichatRails::Message.to('toUser')
+        .news([{ title: 'title',
+                 description: 'description',
+                 url: 'url', pic_url: 'pic_url'}])
 
         expect(request.to_json).to eq({touser: 'toUser', msgtype: 'news', news: {articles: [
           {
@@ -246,19 +258,26 @@ RSpec.describe WeichatRails::Message do
         ]}}.to_json)
       end
 
-
-
-
     end
 
+    describe '#save_to!' do
+      it 'when given a model class, it will create a new model instance with json_hash and save it.' do
+        model_class = double('Model Class')
+        model = double('Model Instance')
 
+        message = WeichatRails::Message.to('toUser')
+        expect(model_class).to receive(:new).with(to_user_name: 'toUser',
+                                                  msg_type: 'text',
+                                                  content: 'text message',
+                                                  create_time: message[:CreateTime]).and_return(model)
+
+        expect(model).to receive(:save!).and_return(true)
+
+        expect(message.text('text message').save_to!(model_class)).to eq(message)
+
+      end
+    end
 
   end
-
-
-
-
-
-
 
 end

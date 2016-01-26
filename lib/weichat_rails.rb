@@ -20,6 +20,7 @@ module WeichatRails
   Config = Struct.new(:cache,:cache_namespace,:appid,:secret,:timeout,:skip_verify_ssl)
 
   class << self
+
     def config
       @config ||= Config.new(nil,'weichat_rails',nil,nil,20,true)
     end
@@ -40,7 +41,7 @@ module WeichatRails
   #config.cache_namespace = 'weichat_rails'
 
   #if use rails with dalli,you can set config.cache = Rails.cache
-  config.cache ||= if defined?(::Rails)
+  self.config.cache ||= if defined?(::Rails)
                      Rails.cache
                    else
                      Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)

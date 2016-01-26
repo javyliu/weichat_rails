@@ -154,7 +154,7 @@ module WeichatRails
 
 
     #def wechat_model
-      #@wechat_model || WeichatRails.config.public_account_class.constantize
+    #@wechat_model || WeichatRails.config.public_account_class.constantize
     #end
 
     #TODO init wechat , wechat_user,token from database

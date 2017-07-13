@@ -41,13 +41,18 @@ module WeichatRails
   #config.cache_namespace = 'weichat_rails'
 
   #if use rails with dalli,you can set config.cache = Rails.cache
-  self.config.cache ||= if defined?(::Rails)
-                     Rails.cache
-                   else
-                     Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
-                   end
+  #self.config.cache=Rails.cache # ||= if defined?(::Rails)
+                     #Rails.cache
+                   #else
+                     #Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
+                   #end
 end
-
+#puts "=======================#{defined?(::Rails)}"
+#WeichatRails.config.cache = if defined?(::Rails)
+                              #Rails.cache
+                            #else
+                              #Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
+                            #end
 if defined? ActionController::Base
   class ActionController::Base
     def self.wechat_responder opts={}

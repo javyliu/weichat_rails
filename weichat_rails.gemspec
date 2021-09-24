@@ -19,14 +19,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
 
-  spec.add_dependency "nokogiri"
-  spec.add_dependency 'http'
+  spec.add_dependency "nokogiri", '~>1.12', '>= 1.12.4'
+  spec.add_dependency 'http', '~> 5.0', '>= 5.0.2'
   #spec.add_dependency 'rest-client'
-  spec.add_dependency 'dalli'
-  spec.add_dependency 'activesupport', '~> 3.2.16'
+  spec.add_dependency 'dalli','~> 2.7', '>= 2.7.11'
+  spec.add_dependency 'activesupport', '~> 6.1.4', '>= 6.1.4.1'
 
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "bundler", '~> 2.2', '>= 2.2.3'
+  spec.add_development_dependency "rake" , '~> 13.0', '>= 13.0.6'
   #spec.add_development_dependency "rails", "> 3.2"
-  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rspec', '~> 3.10', '>= 3.10.0'
 end

@@ -47,7 +47,6 @@ module WeichatRails
                           Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
                         end
 end
-
 if defined? ActionController::Base
   class ActionController::Base
     def self.wechat_responder opts={}

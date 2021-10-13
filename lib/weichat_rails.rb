@@ -42,10 +42,10 @@ module WeichatRails
 
   #if use rails with dalli,you can set config.cache = Rails.cache
   self.config.cache ||= if defined?(::Rails)
-                     Rails.cache
-                   else
-                     Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
-                   end
+                          Rails.cache
+                        else
+                          Dalli::Client.new('localhost:11211',namespace: config.cache_namespace,conpress: true)
+                        end
 end
 
 if defined? ActionController::Base

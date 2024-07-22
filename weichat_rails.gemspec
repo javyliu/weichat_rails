@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'http', '~> 1.0', '>= 1.0.1'
   #spec.add_dependency 'rest-client'
   spec.add_dependency 'dalli'
-  spec.add_dependency 'activesupport', '>= 3.2', '< 5.1.x'
+  spec.add_dependency 'activesupport', '> 0'
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"

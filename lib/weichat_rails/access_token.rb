@@ -10,7 +10,7 @@ module WeichatRails
 
     #store token in rails.cache
     def token
-      WeichatRails.config.cache.fetch(appid,expires_in: 7200) do
+      WeichatRails.config.cache.fetch(appid,7200) do
         data = client.get("token", params:{grant_type: "client_credential", appid: appid, secret: secret})
         valid_token(data)
       end

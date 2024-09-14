@@ -115,7 +115,7 @@ module WeichatRails
     #用于公众号开发者中心服务器配置中的URL配置,其中xxx为该公众号在开发者数据库中的唯一识别码，由auto_generate_secret_key 来产生
     #如：http://m.pipgame.com/wx/xxxxx
     def show
-      render :text => params[:echostr]
+      render :plain => params[:echostr]
     end
 
     #创建两个message对像，原请求message及返回message信息，返回的message中传入当前公众号对像，用于回调函数中访问该公众号在数据库中的配置信息
@@ -144,7 +144,7 @@ module WeichatRails
     private
     def verify_signature
       array = [self.token, params[:timestamp], params[:nonce]].compact.sort
-      render :text => "Forbidden", :status => 403 if params[:signature] != Digest::SHA1.hexdigest(array.join)
+      render :plain => "Forbidden", :status => 403 if params[:signature] != Digest::SHA1.hexdigest(array.join)
     end
 
     def post_xml
